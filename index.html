@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gruhapravesham</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,23 +32,28 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
-  html, body { background: var(--ground-1); }
+  html, body { background: var(--ground-1); overflow-x: hidden; }
 
   body {
     font-family: var(--sans);
     color: var(--ink);
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .stage {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 1.6rem 1rem 3rem;
+    padding: 1.6rem 1rem calc(3rem + env(safe-area-inset-bottom, 0px));
     background:
       radial-gradient(ellipse 120% 70% at 50% -10%, rgba(230, 185, 190, 0.35), transparent 60%),
       radial-gradient(ellipse 90% 60% at 50% 110%, rgba(198, 161, 91, 0.14), transparent 60%),
@@ -238,10 +243,10 @@
     margin-top: 0.3rem;
     font-family: var(--serif);
     font-weight: 600;
-    font-size: clamp(1.15rem, 4.6vw, 1.4rem);
-    letter-spacing: 0.04em;
+    font-size: clamp(1rem, 5.4vw, 1.4rem);
+    letter-spacing: 0.02em;
     color: var(--deep);
-    white-space: nowrap;
+    text-wrap: balance;
     font-variant-numeric: lining-nums tabular-nums;
     font-feature-settings: "lnum" 1, "tnum" 1;
   }
@@ -255,7 +260,7 @@
     color: var(--deep);
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.55rem;
   }
   .venue-label svg { color: var(--deep); flex: none; }
   .venue-addr {
@@ -272,8 +277,8 @@
     align-items: center;
     gap: 0.45rem;
     margin-top: 0.6rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     font-weight: 500;
     color: var(--deep);
@@ -281,7 +286,10 @@
     background: linear-gradient(120deg, var(--gold-soft), var(--blush));
     border: 1px solid var(--gold);
     border-radius: 999px;
-    padding: 0.5rem 1.15rem;
+    padding: 0.65rem 1.2rem;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     transition: all 0.25s ease;
   }
   .venue a.map-btn svg { flex: none; }
@@ -359,21 +367,24 @@
   /* ---------- music toggle ---------- */
   .music {
     position: fixed;
-    right: 1.1rem;
-    bottom: 1.1rem;
+    right: calc(1.1rem + env(safe-area-inset-right, 0px));
+    bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     font-family: var(--sans);
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--pill-ink);
     background: var(--pill-bg);
     border: 1px solid var(--frame-edge);
     border-radius: 999px;
-    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    padding: 0.65rem 1.05rem 0.65rem 0.85rem;
+    min-height: 44px;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     backdrop-filter: blur(6px);
     transition: all 0.25s ease;
     z-index: 10;
@@ -411,41 +422,6 @@
     50%  { transform: translate(var(--drift, 30px), 55vh) rotate(170deg); }
     92%  { opacity: 0.65; }
     100% { transform: translate(calc(var(--drift, 30px) * -1), 112vh) rotate(340deg); opacity: 0; }
-  }
-
-  /* ---------- petal burst on touch / click ---------- */
-  .tap-fx {
-    position: fixed;
-    left: 0; top: 0;
-    width: 0; height: 0;
-    pointer-events: none;
-    z-index: 5;
-  }
-  .tap-ring {
-    position: absolute;
-    left: 0; top: 0;
-    width: 12px; height: 12px;
-    margin: -6px 0 0 -6px;
-    border-radius: 50%;
-    border: 1.5px solid var(--gold);
-    opacity: 0.7;
-    animation: tap-ring-grow 0.6s ease-out forwards;
-  }
-  @keyframes tap-ring-grow {
-    0%   { transform: scale(0.3); opacity: 0.6; }
-    100% { transform: scale(5.5); opacity: 0; }
-  }
-  .tap-spark {
-    position: absolute;
-    left: 0; top: 0;
-    margin: -8px 0 0 -6px;
-    opacity: 0;
-    animation: tap-spark-fly 0.85s ease-out forwards;
-  }
-  @keyframes tap-spark-fly {
-    0%   { transform: translate(0, 0) scale(0.4) rotate(0deg); opacity: 0; }
-    18%  { opacity: 1; }
-    100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
   }
 </style>
 </head>
@@ -497,7 +473,7 @@
 
       <div class="venue">
         <p class="venue-label">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--gold)" fill-opacity="0.25" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
           </svg>
           Venue
@@ -695,48 +671,6 @@
       petalLayer.appendChild(host);
     }
     document.body.insertBefore(petalLayer, document.body.firstChild);
-  }
-
-  /* ---------- petal burst on touch / click ---------- */
-  if (!reduceMotion) {
-    var burstBusy = false;
-    function petalBurst(x, y) {
-      if (burstBusy) return;
-      burstBusy = true;
-      setTimeout(function () { burstBusy = false; }, 60);
-
-      var wrap = document.createElement("div");
-      wrap.className = "tap-fx";
-      wrap.style.left = x + "px";
-      wrap.style.top = y + "px";
-
-      var ring = document.createElement("span");
-      ring.className = "tap-ring";
-      wrap.appendChild(ring);
-
-      var n = 6 + Math.floor(Math.random() * 2);
-      for (var i = 0; i < n; i++) {
-        var spark = document.createElement("span");
-        spark.className = "tap-spark";
-        var angle = (Math.PI * 2 / n) * i + (Math.random() * 0.5 - 0.25);
-        var dist = 24 + Math.random() * 26;
-        var tx = Math.cos(angle) * dist;
-        var ty = Math.sin(angle) * dist - 12;
-        spark.style.setProperty("--tx", tx.toFixed(1) + "px");
-        spark.style.setProperty("--ty", ty.toFixed(1) + "px");
-        spark.style.setProperty("--rot", Math.round(Math.random() * 200 - 100) + "deg");
-        spark.style.animationDelay = (Math.random() * 0.06) + "s";
-        spark.appendChild(petalShape(7 + Math.random() * 6, petalColors[i % petalColors.length]));
-        wrap.appendChild(spark);
-      }
-
-      document.body.appendChild(wrap);
-      setTimeout(function () { wrap.remove(); }, 950);
-    }
-    document.addEventListener("pointerdown", function (e) {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      petalBurst(e.clientX, e.clientY);
-    });
   }
 
   /* ---------- Google Maps pin ----------
@@ -947,15 +881,18 @@
   /* ---------- try to play automatically ----------
      Most browsers block unmuted autoplay until the visitor has interacted
      with the page, so this quietly tries on load and, if blocked, starts
-     the moment the very first tap/click/keypress lands anywhere on the card. */
+     the moment the very first tap/click/keypress lands anywhere on the card.
+     "click" and "touchend" are used (not "touchstart"/"pointerdown") because
+     iOS Safari only counts those as a real user gesture for unlocking audio —
+     that mismatch was why music worked on laptop but stayed silent on phone. */
   window.addEventListener("load", function () {
     fileAudio.volume = 0.55;
     fileAudio.play()
       .then(function () { mode = "file"; markPlaying(); })
       .catch(function () { /* autoplay blocked — wait for first interaction */ });
   });
-  ["pointerdown", "keydown", "touchstart"].forEach(function (evt) {
-    document.addEventListener(evt, function () { startMusic(); }, { once: true, passive: true });
+  ["click", "touchend", "keydown"].forEach(function (evt) {
+    document.addEventListener(evt, function () { startMusic(); }, { once: true });
   });
 })();
 </script>

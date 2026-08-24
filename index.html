@@ -716,7 +716,7 @@
         fileAudio.src = URL.createObjectURL(retyped);
       })
       .catch(function () { /* leave the original <source src="music.mp3"> as the fallback */ })
-      .then(function () { mimeFixed = true; });
+      .then(function () { mimeFixed = true; beginMutedAutoplay(); });
   })();
 
   function ensureCtx() {
@@ -874,6 +874,7 @@
        AbortError that used to knock playback into the synth fallback */
     if (pending) { pending.then(doPause); } else { doPause(); }
     stopSynth();
+    mutedActive = false;
     playing = false;
     btn.setAttribute("aria-pressed", "false");
     btn.setAttribute("aria-label", "Play background music");
@@ -887,22 +888,40 @@
     label.textContent = "Playing";
   }
 
-  /* Only "click" and "keydown" are unambiguous discrete gestures. Every
-     genuine tap gets a synthetic "click" fired for it, but a swipe/scroll
-     does NOT — browsers suppress the synthetic click for a drag — and the
-     "touchend" that ends a swipe is also not counted by browsers as real
-     "user activation" for audio, even though the identical touchend event
-     for a plain tap IS. Since touchend is ambiguous between the two, only a
-     rejection following an actual click/keydown is trusted enough to mean
-     the file genuinely can't play; touchend/touchmove/scroll/wheel/load are
-     all opportunistic — try, but always wait quietly on failure instead of
-     giving up on the real file and dropping to the veena synth. */
+  /* ---------- muted-autoplay unlock ----------
+     Browsers block *unmuted* autoplay without a gesture, but MUTED autoplay
+     is broadly allowed with no gesture at all (that's how background video
+     autoplay works everywhere). So instead of waiting for a "real" gesture
+     to start the file, start it muted the instant it's ready, and treat
+     literally any interaction afterward — including scroll/swipe, which
+     browsers don't grant true "user activation" for — as permission to just
+     flip mute off. Unmuting isn't gated by the same strict gesture rules as
+     starting playback cold, so this is what lets a swipe genuinely make the
+     music audible instead of only being able to best-effort try it. */
+  var mutedActive = false;
+
+  function beginMutedAutoplay() {
+    fileAudio.muted = true;
+    fileAudio.volume = 0.55;
+    fileAudio.play()
+      .then(function () { mode = "file"; mutedActive = true; })
+      .catch(function () { /* muted autoplay blocked too (rare) — the gesture-based fallback below still covers this */ });
+  }
+
+  /* Only "click" and "keydown" are unambiguous discrete gestures — used
+     only as a fallback path below, for the rare case muted autoplay itself
+     didn't get going. Every genuine tap gets a synthetic "click" fired for
+     it, but a swipe/scroll does NOT — browsers suppress the synthetic click
+     for a drag — so only a rejection following an actual click/keydown is
+     trusted enough to mean the file genuinely can't play and fall back to
+     the veena synth. */
   var trustedGesture = false;
 
   function tryPlayFile() {
     if (playing) return Promise.resolve();
     if (pending) return pending;
     if (mode === "synth") { startSynth(); markPlaying(); return Promise.resolve(); }
+    fileAudio.muted = false;
     fileAudio.volume = 0.55;
     pending = fileAudio.play()
       .then(function () { mode = "file"; markPlaying(); })
@@ -916,13 +935,6 @@
            raw server URL's bad Content-Type — not a real "this file can't
            play" verdict. Wait for the retag instead of giving up on it. */
         if (!mimeFixed) return;
-        /* trustedGesture is read live here, not captured when this call
-           started — so if a touchend/scroll attempt is still the in-flight
-           `pending` promise when the user's real click lands right after,
-           that click's startMusic() call reuses this same promise (see the
-           `if (pending) return pending` above) but still marks the eventual
-           failure as fallback-eligible, because it flips this flag before
-           returning. */
         if (!trustedGesture) return;
         mode = "synth"; startSynth(); markPlaying();
       })
@@ -930,45 +942,43 @@
     return pending;
   }
 
-  function startMusic() { trustedGesture = true; return tryPlayFile(); }
-  function opportunisticUnlock() { return tryPlayFile(); }
+  /* revealMusic() is what every interaction listener below calls. If the
+     muted background track is already running, this is *always* enough —
+     no gesture-trust distinction needed, since unmuting isn't restricted
+     the way starting playback is. Only when that muted track never got
+     going do we fall back to attempting a fresh, gesture-gated play(). */
+  function revealMusic(isTrusted) {
+    if (isTrusted) trustedGesture = true;
+    if (playing) return Promise.resolve();
+    if (mutedActive) { fileAudio.muted = false; markPlaying(); return Promise.resolve(); }
+    return tryPlayFile();
+  }
+
+  function startMusic() { return revealMusic(true); }
 
   btn.addEventListener("click", function () {
     if (playing) { stopAll(); return; }
     startMusic();
   });
 
-  /* ---------- try to play automatically ----------
-     Most browsers block unmuted autoplay until the visitor has interacted
-     with the page, so this quietly tries on load and, if blocked, starts
-     the moment the very first tap/click/keypress lands anywhere on the
-     card — with scroll/swipe/wheel also given an opportunistic try below. */
-  window.addEventListener("load", function () { opportunisticUnlock(); });
-
-  /* Real, browser-trusted discrete gestures — a click (covers taps, since
-     mobile browsers synthesize one for an actual tap) or a keypress. */
-  ["click", "keydown"].forEach(function (evt) {
-    document.addEventListener(evt, function (e) {
+  /* ---------- reveal on any interaction ----------
+     Most browsers block *unmuted* autoplay until the visitor has interacted
+     with the page — beginMutedAutoplay() above already has the file running
+     silently by then in the common case, so every one of these just needs
+     to unmute it. click/keydown are kept as the "trusted" gestures for the
+     rare fallback path (see tryPlayFile), everything else — a tap's
+     touchend, a swipe's touchend, touchmove, scroll, wheel — is treated
+     identically since revealMusic() no longer needs to distinguish them. */
+  ["click", "keydown", "touchend", "touchmove", "scroll", "wheel"].forEach(function (evt) {
+    var isTrusted = evt === "click" || evt === "keydown";
+    var target = (evt === "scroll" || evt === "wheel" || evt === "touchmove") ? window : document;
+    target.addEventListener(evt, function (e) {
       /* Skip taps that land on the music button itself — its own click
          handler above already handles those. Without this guard, a tap on
          the button fires this listener too via bubbling, double-driving
          start/stop calls back to back for the same tap. */
       if (btn.contains(e.target)) return;
-      startMusic();
-    }, { once: true });
-  });
-
-  /* Ambiguous/passive gestures — touchend also fires for the end of a
-     swipe (not just a tap), and scroll/wheel/touchmove aren't reliably
-     accepted by browsers as real "user activation" for audio at all. Try
-     them anyway, but opportunisticUnlock() never commits to the synth
-     fallback on its own — it just waits quietly for a real click/keypress
-     if the attempt is rejected. */
-  ["touchend", "touchmove", "scroll", "wheel"].forEach(function (evt) {
-    var target = evt === "touchend" ? document : window;
-    target.addEventListener(evt, function (e) {
-      if (btn.contains(e.target)) return;
-      opportunisticUnlock();
+      revealMusic(isTrusted);
     }, { once: true, passive: true });
   });
 })();

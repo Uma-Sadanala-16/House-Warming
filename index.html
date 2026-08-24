@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7e8d4">
 <title>Sadanala Family Gruhapravesham Invitation</title>
+
+<!-- Purple rounded-square favicon with white U -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23b423e8'/%3E%3Cstop offset='1' stop-color='%237c20d6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-size='38' font-weight='700' fill='white'%3EU%3C/text%3E%3C/svg%3E">
+<link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%239127dc'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-size='38' font-weight='700' fill='white'%3EU%3C/text%3E%3C/svg%3E">
+
 <style>
 :root{
   --maroon:#7c2525;
@@ -12,32 +17,48 @@
   --gold:#b98a3e;
   --cream:#fff8ec;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden}
-body{font-family:Arial,sans-serif;background:#ead1ad;-webkit-tap-highlight-color:transparent}
-button,a{-webkit-tap-highlight-color:transparent}
 
-.app{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  height:100dvh;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,
+body{
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
   overflow:hidden;
+  overscroll-behavior:none;
   background:#ead1ad;
 }
 
-/* Shared full-screen backdrop: fills unused screen space without ugly margins. */
-.screen-backdrop{
-  position:absolute;
-  inset:-28px;
-  width:calc(100% + 56px);
-  height:calc(100% + 56px);
-  object-fit:cover;
-  filter:blur(24px) saturate(.9) brightness(.96);
-  transform:scale(1.08);
-  opacity:.72;
-  user-select:none;
-  pointer-events:none;
+body{
+  font-family:Arial,sans-serif;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+button,
+a{
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* =========================================================
+   FULL VIEWPORT APP
+   ========================================================= */
+.app{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  background:#ead1ad;
 }
 
 /* =========================================================
@@ -47,118 +68,224 @@ button,a{-webkit-tap-highlight-color:transparent}
   position:absolute;
   inset:0;
   z-index:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:100%;
+  height:100%;
   overflow:hidden;
   opacity:0;
-  transform:scale(1.025);
-  transition:opacity 1s ease,transform 1.3s cubic-bezier(.2,.72,.2,1);
+  transform:scale(1.02);
+  transition:
+    opacity 1s ease,
+    transform 1.3s cubic-bezier(.2,.72,.2,1);
 }
-.app.opened .invitation-screen{opacity:1;transform:scale(1)}
+
+.app.opened .invitation-screen{
+  opacity:1;
+  transform:scale(1);
+}
 
 .invitation-poster{
-  position:relative;
-  z-index:2;
-  width:min(100vw, calc(100dvh * 2 / 3));
-  aspect-ratio:2 / 3;
-  max-height:100dvh;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
   overflow:hidden;
-  box-shadow:0 18px 55px rgba(76,40,12,.14);
 }
+
 .invitation-image{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:contain;
   display:block;
+  object-fit:cover;
+  object-position:48% center;
   user-select:none;
   -webkit-user-drag:none;
   pointer-events:none;
 }
 
-/* LOCATION */
+/* =========================================================
+   LOCATION BUTTON
+   ========================================================= */
 .map-cta{
   position:absolute;
-  right:4%;
-  bottom:3.6%;
-  z-index:6;
+  right:max(10px,3.5vw);
+  bottom:max(10px,3.2vh);
+  z-index:8;
+
   display:inline-flex;
   align-items:center;
   gap:7px;
+
   min-height:40px;
   padding:6px 10px 6px 6px;
+
   border:1px solid rgba(148,103,42,.78);
   border-radius:999px;
+
   color:var(--maroon-dark);
   background:rgba(255,248,236,.95);
   text-decoration:none;
+
   box-shadow:0 8px 22px rgba(70,39,12,.22);
   backdrop-filter:blur(7px);
   -webkit-backdrop-filter:blur(7px);
+
   opacity:0;
   transform:translateY(10px);
-  transition:opacity .65s ease 1s,transform .65s ease 1s,background .2s ease;
-}
-.app.opened .map-cta{opacity:1;transform:translateY(0)}
-.map-cta:hover{background:#fffaf1}
-.map-pin{
-  width:28px;height:28px;flex:0 0 28px;
-  display:grid;place-items:center;border-radius:50%;
-  background:linear-gradient(180deg,#983636,#711d1d);color:#fff8eb;
-}
-.map-pin svg{width:14px;height:14px}
-.map-copy{display:flex;flex-direction:column;line-height:1;white-space:nowrap}
-.map-title{font-family:Georgia,"Times New Roman",serif;font-size:10px;font-weight:700}
-.map-sub{margin-top:3px;font-size:6.8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a37b4d}
 
-/* MUSIC */
-.music-button{
-  position:absolute;
-  top:max(12px,env(safe-area-inset-top));
-  right:max(12px,env(safe-area-inset-right));
-  z-index:7;
-  width:43px;height:43px;
-  display:grid;place-items:center;
-  border:1px solid rgba(148,103,42,.72);
-  border-radius:50%;
-  background:rgba(255,248,236,.95);
-  color:var(--maroon);
-  box-shadow:0 7px 21px rgba(70,39,12,.2);
-  cursor:pointer;
-  opacity:0;
-  transform:translateY(-8px);
-  transition:opacity .65s ease 1s,transform .65s ease 1s,background .2s ease;
+  transition:
+    opacity .65s ease 1s,
+    transform .65s ease 1s,
+    background .2s ease;
 }
-.app.opened .music-button{opacity:1;transform:translateY(0)}
-.music-button:hover{background:#fffaf1}
-.music-button:active{transform:scale(.95)}
-.music-button svg{width:21px;height:21px}
-.music-slash{opacity:0;transition:opacity .2s ease}
-.music-button[aria-pressed="false"] .music-slash{opacity:1}
+
+.app.opened .map-cta{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.map-cta:hover,
+.map-cta:focus-visible{
+  background:#fffaf1;
+}
+
+.map-cta:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+}
+
+.map-pin{
+  width:28px;
+  height:28px;
+  flex:0 0 28px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+  background:linear-gradient(180deg,#983636,#711d1d);
+  color:#fff8eb;
+}
+
+.map-pin svg{
+  width:14px;
+  height:14px;
+}
+
+.map-copy{
+  display:flex;
+  flex-direction:column;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.map-title{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:10px;
+  font-weight:700;
+}
+
+.map-sub{
+  margin-top:3px;
+  font-size:6.8px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#a37b4d;
+}
 
 /* =========================================================
-   OPENING POSTER
+   MUSIC BUTTON
+   ========================================================= */
+.music-button{
+  position:absolute;
+  top:max(10px,env(safe-area-inset-top));
+  right:max(10px,env(safe-area-inset-right));
+  z-index:9;
+
+  width:43px;
+  height:43px;
+
+  display:grid;
+  place-items:center;
+
+  border:1px solid rgba(148,103,42,.72);
+  border-radius:50%;
+
+  background:rgba(255,248,236,.95);
+  color:var(--maroon);
+
+  box-shadow:0 7px 21px rgba(70,39,12,.2);
+  cursor:pointer;
+
+  opacity:0;
+  transform:translateY(-8px);
+
+  transition:
+    opacity .65s ease 1s,
+    transform .65s ease 1s,
+    background .2s ease;
+}
+
+.app.opened .music-button{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.music-button:hover,
+.music-button:focus-visible{
+  background:#fffaf1;
+}
+
+.music-button:active{
+  transform:scale(.95);
+}
+
+.music-button:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+}
+
+.music-button svg{
+  width:21px;
+  height:21px;
+}
+
+.music-slash{
+  opacity:0;
+  transition:opacity .2s ease;
+}
+
+.music-button[aria-pressed="false"] .music-slash{
+  opacity:1;
+}
+
+/* =========================================================
+   OPENING SCREEN
    ========================================================= */
 .opening-screen{
   position:absolute;
   inset:0;
   z-index:50;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:100%;
+  height:100%;
   overflow:hidden;
+
   opacity:1;
   visibility:visible;
   filter:blur(0);
   transform:scale(1);
+
   transition:
     opacity .9s ease,
     filter .9s ease,
     transform 1.1s cubic-bezier(.2,.72,.2,1),
     visibility .9s ease;
 }
+
 .opening-screen.hide{
   opacity:0;
   visibility:hidden;
@@ -166,44 +293,56 @@ button,a{-webkit-tap-highlight-color:transparent}
   filter:blur(3px);
   transform:scale(1.025);
 }
+
 .opening-poster{
-  position:relative;
-  z-index:2;
-  width:min(100vw, calc(100dvh * 2 / 3));
-  aspect-ratio:2 / 3;
-  max-height:100dvh;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
   overflow:hidden;
-  box-shadow:0 18px 55px rgba(76,40,12,.15);
 }
+
 .opening-image{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:contain;
   display:block;
+  object-fit:cover;
+  object-position:center center;
   user-select:none;
   -webkit-user-drag:none;
   pointer-events:none;
 }
 
-/* Transparent hotspot exactly over the OPEN INVITATION button printed in opening.png. */
+/* =========================================================
+   OPEN INVITATION HOTSPOT
+
+   The JS below keeps this hotspot aligned to the button
+   printed inside opening.png even when object-fit: cover
+   crops the left/right or top/bottom of the source image.
+   ========================================================= */
 .open-hotspot{
   position:absolute;
-  left:21.4%;
-  top:77.3%;
-  width:57.4%;
-  height:7.7%;
-  z-index:5;
+  z-index:55;
+
   border:0;
   border-radius:999px;
   background:rgba(255,255,255,0);
-  cursor:pointer;
   color:transparent;
+  cursor:pointer;
   overflow:hidden;
+
   box-shadow:0 0 0 0 rgba(255,220,145,0);
-  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
 }
+
 .open-hotspot::after{
   content:"";
   position:absolute;
@@ -212,20 +351,28 @@ button,a{-webkit-tap-highlight-color:transparent}
   box-shadow:inset 0 0 0 1px rgba(255,220,145,0);
   transition:box-shadow .18s ease;
 }
+
 .open-hotspot:hover,
 .open-hotspot:focus-visible{
   transform:scale(1.018);
   background:rgba(255,242,207,.035);
   box-shadow:0 0 0 7px rgba(185,138,62,.08);
 }
+
 .open-hotspot:hover::after,
 .open-hotspot:focus-visible::after{
   box-shadow:inset 0 0 0 1px rgba(255,224,161,.34);
 }
-.open-hotspot:active{transform:scale(.985)}
-.open-hotspot:focus-visible{outline:2px solid rgba(185,138,62,.82);outline-offset:4px}
 
-/* small first-load shimmer to make the printed button feel interactive */
+.open-hotspot:active{
+  transform:scale(.985);
+}
+
+.open-hotspot:focus-visible{
+  outline:2px solid rgba(185,138,62,.82);
+  outline-offset:4px;
+}
+
 .open-hotspot::before{
   content:"";
   position:absolute;
@@ -237,36 +384,76 @@ button,a{-webkit-tap-highlight-color:transparent}
   background:linear-gradient(90deg,transparent,rgba(255,245,212,.18),transparent);
   animation:buttonShine 3.1s ease-in-out infinite;
 }
+
 @keyframes buttonShine{
   0%,60%{left:-30%}
   100%{left:120%}
 }
 
 @media (max-width:640px){
-  .map-cta{right:3.5%;bottom:3.3%;padding:5px 9px 5px 5px;min-height:37px}
-  .map-pin{width:26px;height:26px;flex-basis:26px}
-  .map-pin svg{width:13px;height:13px}
-  .map-title{font-size:9.5px}
-  .map-sub{font-size:6.3px}
-  .music-button{width:41px;height:41px;top:10px;right:10px}
-  .music-button svg{width:20px;height:20px}
+  .map-cta{
+    right:max(9px,3vw);
+    bottom:max(9px,2.7vh);
+    padding:5px 9px 5px 5px;
+    min-height:37px;
+  }
+
+  .map-pin{
+    width:26px;
+    height:26px;
+    flex-basis:26px;
+  }
+
+  .map-pin svg{
+    width:13px;
+    height:13px;
+  }
+
+  .map-title{
+    font-size:9.5px;
+  }
+
+  .map-sub{
+    font-size:6.3px;
+  }
+
+  .music-button{
+    width:41px;
+    height:41px;
+  }
+
+  .music-button svg{
+    width:20px;
+    height:20px;
+  }
 }
 
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
 }
 </style>
 </head>
+
 <body>
 <div class="app" id="app">
 
   <!-- ORIGINAL INVITATION -->
   <section class="invitation-screen" aria-label="Sadanala Family Gruhapravesham invitation">
-    <img class="screen-backdrop" src="invitation.jpeg" alt="" aria-hidden="true">
-
     <div class="invitation-poster">
-      <img class="invitation-image" src="invitation.jpeg" alt="Sadanala Family Gruhapravesham Invitation" draggable="false">
 
+      <!-- Your existing invitation image -->
+      <img
+        class="invitation-image"
+        src="invitation.jpeg"
+        alt="Sadanala Family Gruhapravesham Invitation"
+        draggable="false"
+      >
+
+      <!-- LOCATION -->
       <a
         class="map-cta"
         href="https://www.google.com/maps/search/Jayapradam%20Apartment/@17.48279199,78.37930255,17z?hl=en"
@@ -276,16 +463,21 @@ button,a{-webkit-tap-highlight-color:transparent}
       >
         <span class="map-pin" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z" fill="currentColor"/>
+            <path
+              d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"
+              fill="currentColor"
+            />
             <circle cx="12" cy="10" r="2.7" fill="#7b2424"/>
           </svg>
         </span>
+
         <span class="map-copy">
           <span class="map-title">View Location</span>
           <span class="map-sub">Google Maps ↗</span>
         </span>
       </a>
 
+      <!-- MUSIC -->
       <button
         class="music-button"
         id="musicButton"
@@ -295,37 +487,74 @@ button,a{-webkit-tap-highlight-color:transparent}
         title="Background music"
       >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M9 18V6.8L19 5v10.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M9 18V6.8L19 5v10.1"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
           <ellipse cx="6.3" cy="18.2" rx="3.3" ry="2.5" fill="currentColor"/>
           <ellipse cx="16.3" cy="15.4" rx="3.3" ry="2.5" fill="currentColor"/>
-          <path d="M9 9.4 19 7.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-          <path class="music-slash" d="M4 4 20 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path
+            d="M9 9.4 19 7.6"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+          />
+          <path
+            class="music-slash"
+            d="M4 4 20 20"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+          />
         </svg>
       </button>
+
     </div>
   </section>
 
   <!-- OPENING IMAGE -->
-  <section class="opening-screen" id="openingScreen" aria-label="Housewarming welcome screen">
-    <img class="screen-backdrop" src="opening.png" alt="" aria-hidden="true">
-
+  <section
+    class="opening-screen"
+    id="openingScreen"
+    aria-label="Housewarming welcome screen"
+  >
     <div class="opening-poster">
-      <img class="opening-image" src="opening.png" alt="Housewarming celebration - tap Open Invitation to continue" draggable="false">
-      <button class="open-hotspot" id="openButton" type="button" aria-label="Open invitation">
+
+      <img
+        class="opening-image"
+        id="openingImage"
+        src="opening.png"
+        alt="Housewarming celebration - tap Open Invitation to continue"
+        draggable="false"
+      >
+
+      <button
+        class="open-hotspot"
+        id="openButton"
+        type="button"
+        aria-label="Open invitation"
+      >
         Open Invitation
       </button>
+
     </div>
   </section>
 
+  <!-- MUSIC FILE -->
   <audio id="bgMusic" preload="auto" loop playsinline>
     <source src="music.mp3" type="audio/mpeg">
   </audio>
+
 </div>
 
 <script>
 (() => {
   const app = document.getElementById('app');
   const openingScreen = document.getElementById('openingScreen');
+  const openingImage = document.getElementById('openingImage');
   const openButton = document.getElementById('openButton');
   const audio = document.getElementById('bgMusic');
   const musicButton = document.getElementById('musicButton');
@@ -333,26 +562,89 @@ button,a{-webkit-tap-highlight-color:transparent}
   let opened = false;
   audio.volume = 0.55;
 
+  /*
+    Printed OPEN INVITATION button coordinates inside opening.png.
+    These are percentages of the ORIGINAL source artwork.
+  */
+  const HOTSPOT = {
+    left: 0.214,
+    top: 0.773,
+    width: 0.574,
+    height: 0.077
+  };
+
+  /*
+    Keep the invisible hotspot aligned with the printed button
+    when object-fit: cover crops the source image.
+  */
+  function positionOpeningHotspot(){
+    if(!openingImage.naturalWidth || !openingImage.naturalHeight) return;
+
+    const containerWidth = openingScreen.clientWidth;
+    const containerHeight = openingScreen.clientHeight;
+
+    const imageWidth = openingImage.naturalWidth;
+    const imageHeight = openingImage.naturalHeight;
+
+    const scale = Math.max(
+      containerWidth / imageWidth,
+      containerHeight / imageHeight
+    );
+
+    const renderedWidth = imageWidth * scale;
+    const renderedHeight = imageHeight * scale;
+
+    const cropX = (renderedWidth - containerWidth) / 2;
+    const cropY = (renderedHeight - containerHeight) / 2;
+
+    const left = imageWidth * HOTSPOT.left * scale - cropX;
+    const top = imageHeight * HOTSPOT.top * scale - cropY;
+    const width = imageWidth * HOTSPOT.width * scale;
+    const height = imageHeight * HOTSPOT.height * scale;
+
+    openButton.style.left = `${left}px`;
+    openButton.style.top = `${top}px`;
+    openButton.style.width = `${width}px`;
+    openButton.style.height = `${height}px`;
+  }
+
   function syncMusicUI(){
     const playing = !audio.paused && !audio.ended;
-    musicButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
-    musicButton.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+
+    musicButton.setAttribute(
+      'aria-pressed',
+      playing ? 'true' : 'false'
+    );
+
+    musicButton.setAttribute(
+      'aria-label',
+      playing
+        ? 'Pause background music'
+        : 'Play background music'
+    );
   }
 
   async function openInvitation(){
     if(opened) return;
     opened = true;
 
-    /* The click on Open Invitation is the browser-approved user gesture for audio. */
+    /*
+      This click is a real user gesture,
+      so browsers normally allow audio here.
+    */
     try{
       await audio.play();
     }catch(err){
-      /* If a browser still blocks it, the music icon remains available after opening. */
+      /* Music button is still available after opening. */
     }
+
     syncMusicUI();
 
     app.classList.add('opened');
-    requestAnimationFrame(() => openingScreen.classList.add('hide'));
+
+    requestAnimationFrame(() => {
+      openingScreen.classList.add('hide');
+    });
   }
 
   async function toggleMusic(event){
@@ -365,14 +657,27 @@ button,a{-webkit-tap-highlight-color:transparent}
       return;
     }
 
-    try{ await audio.play(); }catch(err){}
+    try{
+      await audio.play();
+    }catch(err){}
+
     syncMusicUI();
   }
 
   openButton.addEventListener('click', openInvitation);
   musicButton.addEventListener('click', toggleMusic);
+
   audio.addEventListener('play', syncMusicUI);
   audio.addEventListener('pause', syncMusicUI);
+
+  openingImage.addEventListener('load', positionOpeningHotspot);
+  window.addEventListener('resize', positionOpeningHotspot);
+  window.addEventListener('orientationchange', positionOpeningHotspot);
+
+  if(openingImage.complete){
+    positionOpeningHotspot();
+  }
+
   syncMusicUI();
 })();
 </script>

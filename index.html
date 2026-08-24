@@ -866,7 +866,7 @@
     label.textContent = "Playing";
   }
 
-  function startMusic() {
+  function tryPlayFile(allowSynthFallback) {
     if (playing) return Promise.resolve();
     if (pending) return pending;
     if (mode === "synth") { startSynth(); markPlaying(); return Promise.resolve(); }
@@ -878,14 +878,23 @@
            play()/pause() call landing at the same instant (e.g. the button's
            own click handler and the page-wide "first tap" handler both firing
            for the same tap) — it says nothing about music.mp3 itself, so
-           don't give up on the file over it. Only fall back to the veena
-           synth when the file truly can't play. */
+           don't give up on the file over it. */
         if (err && err.name === "AbortError") return;
+        /* Passive gestures (page load, scroll, swipe-in-progress) aren't
+           always accepted by the browser as real "user activation" for
+           audio, so a rejection there just means try again on the next real
+           interaction — don't give up on the file and drop to the synth
+           over it. Only a rejection from an actual click/tap/keypress is
+           trusted enough to mean the file genuinely can't play. */
+        if (!allowSynthFallback) return;
         mode = "synth"; startSynth(); markPlaying();
       })
       .then(function () { pending = null; });
     return pending;
   }
+
+  function startMusic() { return tryPlayFile(true); }
+  function opportunisticUnlock() { return tryPlayFile(false); }
 
   btn.addEventListener("click", function () {
     if (playing) { stopAll(); return; }
@@ -895,19 +904,37 @@
   /* ---------- try to play automatically ----------
      Most browsers block unmuted autoplay until the visitor has interacted
      with the page, so this quietly tries on load and, if blocked, starts
-     the moment the very first tap/click/keypress lands anywhere on the card.
-     "click" and "touchend" are used (not "touchstart"/"pointerdown") because
-     iOS Safari only counts those as a real user gesture for unlocking audio —
-     that mismatch was why music worked on laptop but stayed silent on phone. */
-  window.addEventListener("load", function () {
-    fileAudio.volume = 0.55;
-    pending = fileAudio.play()
-      .then(function () { mode = "file"; markPlaying(); })
-      .catch(function () { /* autoplay blocked — wait for first interaction */ })
-      .then(function () { pending = null; });
-  });
+     the moment the very first tap/click/keypress/scroll/swipe lands
+     anywhere on the card. "click" and "touchend" are used (not
+     "touchstart"/"pointerdown") because iOS Safari only counts those as a
+     real user gesture for unlocking audio — that mismatch was why music
+     worked on laptop but stayed silent on phone. */
+  window.addEventListener("load", function () { opportunisticUnlock(); });
+
+  /* Real, browser-trusted gestures — a tap, click, or keypress. These are
+     reliably treated as "user activation" for audio, so a rejection here is
+     trusted enough to fall back to the built-in veena synth. */
   ["click", "touchend", "keydown"].forEach(function (evt) {
-    document.addEventListener(evt, function () { startMusic(); }, { once: true });
+    document.addEventListener(evt, function (e) {
+      /* Skip taps that land on the music button itself — its own click
+         handler above already handles those. Without this guard, a tap on
+         the button fires BOTH "touchend" and "click" for the same gesture,
+         and each of those bubbles up and triggers this listener too, so a
+         single tap was driving two or three start/stop calls back to back
+         (start, then an immediate stop, then start again) on mobile. That
+         rapid toggling is what was breaking the real mp3 playback and
+         landing on the veena fallback instead. */
+      if (btn.contains(e.target)) return;
+      startMusic();
+    }, { once: true });
+  });
+
+  /* Scrolling or swiping the page isn't always recognized by the browser as
+     a "real" gesture for unlocking audio, but it's worth trying anyway —
+     opportunisticUnlock() never falls back to the synth on its own, it just
+     waits quietly for a real click/tap/keypress if this attempt is rejected. */
+  ["scroll", "wheel", "touchmove"].forEach(function (evt) {
+    window.addEventListener(evt, function () { opportunisticUnlock(); }, { once: true, passive: true });
   });
 })();
 </script>

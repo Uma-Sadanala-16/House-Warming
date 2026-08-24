@@ -871,6 +871,12 @@
     }
   }
 
+  /* Set once the user explicitly pauses via the button, so the ambient
+     "reveal on any interaction" listeners below stop trying to restart
+     music the user just turned off (they'd otherwise fire again on the
+     very next scroll/tap and undo the pause). startMusic() clears it. */
+  var manuallyStopped = false;
+
   function stopAll() {
     var doPause = function () { if (mode === "file") fileAudio.pause(); };
     /* if a play() is still in flight, wait for it before pausing — calling
@@ -880,6 +886,7 @@
     stopSynth();
     mutedActive = false;
     playing = false;
+    manuallyStopped = true;
     btn.setAttribute("aria-pressed", "false");
     btn.setAttribute("aria-label", "Play background music");
     label.textContent = "Music";
@@ -958,7 +965,7 @@
     return tryPlayFile();
   }
 
-  function startMusic() { return revealMusic(true); }
+  function startMusic() { manuallyStopped = false; return revealMusic(true); }
 
   btn.addEventListener("click", function () {
     if (playing) { stopAll(); return; }
@@ -972,7 +979,16 @@
      to unmute it. click/keydown are kept as the "trusted" gestures for the
      rare fallback path (see tryPlayFile), everything else — a tap's
      touchend, a swipe's touchend, touchmove, scroll, wheel — is treated
-     identically since revealMusic() no longer needs to distinguish them. */
+     identically since revealMusic() no longer needs to distinguish them.
+
+     These listeners are deliberately NOT { once: true }. They used to be,
+     but that meant the once-slot for e.g. "click" got silently consumed by
+     the very first click ANYWHERE — including a tap on the music button
+     itself, which returns early below via the btn.contains guard without
+     ever calling revealMusic(). That left the document permanently unable
+     to reveal music from a tap on the card again. Persistent listeners plus
+     the playing/manuallyStopped checks inside revealMusic()/here keep every
+     extra call a cheap no-op instead. */
   ["click", "keydown", "touchend", "touchmove", "scroll", "wheel"].forEach(function (evt) {
     var isTrusted = evt === "click" || evt === "keydown";
     var target = (evt === "scroll" || evt === "wheel" || evt === "touchmove") ? window : document;
@@ -982,8 +998,11 @@
          the button fires this listener too via bubbling, double-driving
          start/stop calls back to back for the same tap. */
       if (btn.contains(e.target)) return;
+      /* Don't let a scroll/tap elsewhere silently undo a pause the user
+         just made via the button. */
+      if (manuallyStopped) return;
       revealMusic(isTrusted);
-    }, { once: true, passive: true });
+    }, { passive: true });
   });
 })();
 </script>

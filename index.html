@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7e8d4">
-<title>Gruhapravesham Invitation</title>
+<title>Sadanala Family Gruhapravesham Invitation</title>
 
 <!-- Purple rounded-square favicon with white U -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23b423e8'/%3E%3Cstop offset='1' stop-color='%237c20d6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-size='38' font-weight='700' fill='white'%3EU%3C/text%3E%3C/svg%3E">
@@ -167,8 +167,9 @@ a{
   text-decoration:none;
 
   box-shadow:
-    0 10px 28px rgba(81,23,23,.34),
-    0 0 0 0 rgba(224,180,94,0);
+    0 10px 28px rgba(81,23,23,.34);
+
+  overflow:hidden;
 
   opacity:0;
   transform:translateY(12px) scale(.96);
@@ -180,42 +181,43 @@ a{
     box-shadow .2s ease;
 }
 
+/* Same moving shine used by the OPEN INVITATION button */
+.map-cta::before{
+  content:"";
+  position:absolute;
+  top:-35%;
+  left:-30%;
+  width:18%;
+  height:170%;
+  transform:skewX(-20deg);
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,245,212,.32),
+    transparent
+  );
+  pointer-events:none;
+  opacity:0;
+}
+
+/* Fine inner gold highlight, matching the invitation style */
 .map-cta::after{
   content:"";
   position:absolute;
-  inset:-5px;
-  border:2px solid rgba(231,192,111,.7);
+  inset:3px;
+  border:1px solid rgba(255,229,173,.22);
   border-radius:999px;
-  opacity:0;
   pointer-events:none;
 }
 
 .app.opened .map-cta{
   opacity:1;
   transform:translateY(0) scale(1);
-  animation:locationGlow 2.2s ease-in-out 1.35s infinite;
 }
 
-.app.opened .map-cta::after{
-  animation:locationRing 2.2s ease-out 1.35s infinite;
-}
-
-@keyframes locationGlow{
-  0%,100%{
-    box-shadow:
-      0 10px 28px rgba(81,23,23,.34),
-      0 0 0 0 rgba(224,180,94,0);
-  }
-  50%{
-    box-shadow:
-      0 12px 31px rgba(81,23,23,.42),
-      0 0 0 9px rgba(224,180,94,.20);
-  }
-}
-
-@keyframes locationRing{
-  0%{opacity:.8;transform:scale(.98)}
-  70%,100%{opacity:0;transform:scale(1.14)}
+.app.opened .map-cta::before{
+  opacity:1;
+  animation:buttonShine 3.1s ease-in-out 1.25s infinite;
 }
 
 .map-cta:hover,
@@ -340,6 +342,25 @@ a{
 }
 
 /* =========================================================
+   OPENING BACKDROP FOR LAPTOP / LANDSCAPE
+   ========================================================= */
+.opening-backdrop{
+  display:none;
+  position:absolute;
+  inset:-32px;
+  width:calc(100% + 64px);
+  height:calc(100% + 64px);
+  object-fit:cover;
+  object-position:center center;
+  filter:blur(24px) saturate(.92) brightness(.95);
+  transform:scale(1.08);
+  opacity:.80;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
+
+/* =========================================================
    OPENING SCREEN
    ========================================================= */
 .opening-screen{
@@ -373,6 +394,7 @@ a{
 .opening-poster{
   position:absolute;
   inset:0;
+  z-index:2;
   width:100%;
   height:100%;
   margin:0;
@@ -464,6 +486,52 @@ a{
 @keyframes buttonShine{
   0%,60%{left:-30%}
   100%{left:120%}
+}
+
+/* =========================================================
+   LAPTOP / DESKTOP LANDSCAPE
+
+   Portrait phones keep the opening artwork edge-to-edge.
+   On wide screens, trying to COVER a vertical 2:3 poster would
+   crop most of the top and bottom, including the Open button.
+   Therefore the whole poster is shown, while a blurred copy
+   fills the side area.
+   ========================================================= */
+@media (min-width:768px) and (orientation:landscape){
+  .opening-screen{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#e7bf78;
+  }
+
+  .opening-backdrop{
+    display:block;
+  }
+
+  .opening-screen::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:rgba(246,225,187,.10);
+  }
+
+  .opening-poster{
+    position:relative;
+    inset:auto;
+    z-index:2;
+    width:min(100vw, calc(100dvh * 2 / 3));
+    height:auto;
+    aspect-ratio:2 / 3;
+    max-height:100dvh;
+  }
+
+  .opening-image{
+    object-fit:contain;
+    object-position:center center;
+  }
 }
 
 @media (max-width:640px){
@@ -607,7 +675,9 @@ a{
     id="openingScreen"
     aria-label="Housewarming welcome screen"
   >
-    <div class="opening-poster">
+    <img class="opening-backdrop" src="opening.png" alt="" aria-hidden="true">
+
+    <div class="opening-poster" id="openingPoster">
 
       <img
         class="opening-image"
@@ -641,6 +711,7 @@ a{
   const app = document.getElementById('app');
   const openingScreen = document.getElementById('openingScreen');
   const openingImage = document.getElementById('openingImage');
+  const openingPoster = document.getElementById('openingPoster');
   const openButton = document.getElementById('openButton');
   const audio = document.getElementById('bgMusic');
   const musicButton = document.getElementById('musicButton');
@@ -666,25 +737,28 @@ a{
   function positionOpeningHotspot(){
     if(!openingImage.naturalWidth || !openingImage.naturalHeight) return;
 
-    const containerWidth = openingScreen.clientWidth;
-    const containerHeight = openingScreen.clientHeight;
+    const containerWidth = openingPoster.clientWidth;
+    const containerHeight = openingPoster.clientHeight;
 
     const imageWidth = openingImage.naturalWidth;
     const imageHeight = openingImage.naturalHeight;
 
-    const scale = Math.max(
-      containerWidth / imageWidth,
-      containerHeight / imageHeight
-    );
+    const fit = getComputedStyle(openingImage).objectFit;
+
+    const scale = fit === 'contain'
+      ? Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
+      : Math.max(containerWidth / imageWidth, containerHeight / imageHeight);
 
     const renderedWidth = imageWidth * scale;
     const renderedHeight = imageHeight * scale;
 
-    const cropX = (renderedWidth - containerWidth) / 2;
-    const cropY = (renderedHeight - containerHeight) / 2;
+    /* Centered object-position. Negative offsets mean COVER cropping;
+       positive offsets mean CONTAIN letterboxing. */
+    const offsetX = (containerWidth - renderedWidth) / 2;
+    const offsetY = (containerHeight - renderedHeight) / 2;
 
-    const left = imageWidth * HOTSPOT.left * scale - cropX;
-    const top = imageHeight * HOTSPOT.top * scale - cropY;
+    const left = offsetX + imageWidth * HOTSPOT.left * scale;
+    const top = offsetY + imageHeight * HOTSPOT.top * scale;
     const width = imageWidth * HOTSPOT.width * scale;
     const height = imageHeight * HOTSPOT.height * scale;
 

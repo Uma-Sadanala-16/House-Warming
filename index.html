@@ -1,311 +1,272 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ead095">
-  <title>Gruhapravesham Invitation</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7e8d4">
+<title>Sadanala Family Gruhapravesham Invitation</title>
+<style>
+:root{
+  --maroon:#7c2525;
+  --maroon-dark:#5f1919;
+  --gold:#b98a3e;
+  --cream:#fff8ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:Arial,sans-serif;background:#ead1ad;-webkit-tap-highlight-color:transparent}
+button,a{-webkit-tap-highlight-color:transparent}
 
-  <style>
-    :root {
-      --cream: #fff7e8;
-      --gold: #b9893f;
-      --gold-dark: #8f641f;
-      --maroon: #7f2727;
-      --maroon-dark: #641b1b;
-      --shadow: 0 20px 55px rgba(83, 52, 12, .22);
-    }
+.app{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+  background:#ead1ad;
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+/* Shared full-screen backdrop: fills unused screen space without ugly margins. */
+.screen-backdrop{
+  position:absolute;
+  inset:-28px;
+  width:calc(100% + 56px);
+  height:calc(100% + 56px);
+  object-fit:cover;
+  filter:blur(24px) saturate(.9) brightness(.96);
+  transform:scale(1.08);
+  opacity:.72;
+  user-select:none;
+  pointer-events:none;
+}
 
-    html,
-    body {
-      min-height: 100%;
-    }
+/* =========================================================
+   ORIGINAL INVITATION
+   ========================================================= */
+.invitation-screen{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  opacity:0;
+  transform:scale(1.025);
+  transition:opacity 1s ease,transform 1.3s cubic-bezier(.2,.72,.2,1);
+}
+.app.opened .invitation-screen{opacity:1;transform:scale(1)}
 
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-x: hidden;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.6), transparent 34%),
-        linear-gradient(180deg, #f8ecd2 0%, #e9ca8c 100%);
-      -webkit-tap-highlight-color: transparent;
-    }
+.invitation-poster{
+  position:relative;
+  z-index:2;
+  width:min(100vw, calc(100dvh * 2 / 3));
+  aspect-ratio:2 / 3;
+  max-height:100dvh;
+  overflow:hidden;
+  box-shadow:0 18px 55px rgba(76,40,12,.14);
+}
+.invitation-image{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
 
-    .invitation-stage {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+/* LOCATION */
+.map-cta{
+  position:absolute;
+  right:4%;
+  bottom:3.6%;
+  z-index:6;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:40px;
+  padding:6px 10px 6px 6px;
+  border:1px solid rgba(148,103,42,.78);
+  border-radius:999px;
+  color:var(--maroon-dark);
+  background:rgba(255,248,236,.95);
+  text-decoration:none;
+  box-shadow:0 8px 22px rgba(70,39,12,.22);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+  opacity:0;
+  transform:translateY(10px);
+  transition:opacity .65s ease 1s,transform .65s ease 1s,background .2s ease;
+}
+.app.opened .map-cta{opacity:1;transform:translateY(0)}
+.map-cta:hover{background:#fffaf1}
+.map-pin{
+  width:28px;height:28px;flex:0 0 28px;
+  display:grid;place-items:center;border-radius:50%;
+  background:linear-gradient(180deg,#983636,#711d1d);color:#fff8eb;
+}
+.map-pin svg{width:14px;height:14px}
+.map-copy{display:flex;flex-direction:column;line-height:1;white-space:nowrap}
+.map-title{font-family:Georgia,"Times New Roman",serif;font-size:10px;font-weight:700}
+.map-sub{margin-top:3px;font-size:6.8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a37b4d}
 
-    .invitation {
-      position: relative;
-      width: min(96vw, 760px);
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      border-radius: 12px;
-      background: #e7c57f;
-      box-shadow: var(--shadow);
-      isolation: isolate;
-    }
+/* MUSIC */
+.music-button{
+  position:absolute;
+  top:max(12px,env(safe-area-inset-top));
+  right:max(12px,env(safe-area-inset-right));
+  z-index:7;
+  width:43px;height:43px;
+  display:grid;place-items:center;
+  border:1px solid rgba(148,103,42,.72);
+  border-radius:50%;
+  background:rgba(255,248,236,.95);
+  color:var(--maroon);
+  box-shadow:0 7px 21px rgba(70,39,12,.2);
+  cursor:pointer;
+  opacity:0;
+  transform:translateY(-8px);
+  transition:opacity .65s ease 1s,transform .65s ease 1s,background .2s ease;
+}
+.app.opened .music-button{opacity:1;transform:translateY(0)}
+.music-button:hover{background:#fffaf1}
+.music-button:active{transform:scale(.95)}
+.music-button svg{width:21px;height:21px}
+.music-slash{opacity:0;transition:opacity .2s ease}
+.music-button[aria-pressed="false"] .music-slash{opacity:1}
 
-    .invitation-image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      user-select: none;
-      -webkit-user-drag: none;
-      pointer-events: none;
-    }
+/* =========================================================
+   OPENING POSTER
+   ========================================================= */
+.opening-screen{
+  position:absolute;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  opacity:1;
+  visibility:visible;
+  filter:blur(0);
+  transform:scale(1);
+  transition:
+    opacity .9s ease,
+    filter .9s ease,
+    transform 1.1s cubic-bezier(.2,.72,.2,1),
+    visibility .9s ease;
+}
+.opening-screen.hide{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  filter:blur(3px);
+  transform:scale(1.025);
+}
+.opening-poster{
+  position:relative;
+  z-index:2;
+  width:min(100vw, calc(100dvh * 2 / 3));
+  aspect-ratio:2 / 3;
+  max-height:100dvh;
+  overflow:hidden;
+  box-shadow:0 18px 55px rgba(76,40,12,.15);
+}
+.opening-image{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
 
-    /* ---------------------------------------------------------
-       LOCATION BUTTON
-       Bottom-right, away from the invitation text.
-       Fine tune only right/bottom if required for your image.
-       --------------------------------------------------------- */
-    .map-cta {
-      position: absolute;
-      right: 5.2%;
-      bottom: 5.4%;
-      z-index: 4;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 6px 12px 6px 7px;
-      color: var(--maroon-dark);
-      text-decoration: none;
-      border: 1px solid rgba(143, 100, 31, .72);
-      border-radius: 999px;
-      background: rgba(255, 247, 232, .90);
-      box-shadow:
-        0 7px 22px rgba(78, 43, 11, .20),
-        inset 0 1px 0 rgba(255,255,255,.85);
-      -webkit-backdrop-filter: blur(7px);
-      backdrop-filter: blur(7px);
-      transition:
-        transform .22s ease,
-        box-shadow .22s ease,
-        background .22s ease,
-        border-color .22s ease;
-      touch-action: manipulation;
-    }
+/* Transparent hotspot exactly over the OPEN INVITATION button printed in opening.png. */
+.open-hotspot{
+  position:absolute;
+  left:21.4%;
+  top:77.3%;
+  width:57.4%;
+  height:7.7%;
+  z-index:5;
+  border:0;
+  border-radius:999px;
+  background:rgba(255,255,255,0);
+  cursor:pointer;
+  color:transparent;
+  overflow:hidden;
+  box-shadow:0 0 0 0 rgba(255,220,145,0);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.open-hotspot::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(255,220,145,0);
+  transition:box-shadow .18s ease;
+}
+.open-hotspot:hover,
+.open-hotspot:focus-visible{
+  transform:scale(1.018);
+  background:rgba(255,242,207,.035);
+  box-shadow:0 0 0 7px rgba(185,138,62,.08);
+}
+.open-hotspot:hover::after,
+.open-hotspot:focus-visible::after{
+  box-shadow:inset 0 0 0 1px rgba(255,224,161,.34);
+}
+.open-hotspot:active{transform:scale(.985)}
+.open-hotspot:focus-visible{outline:2px solid rgba(185,138,62,.82);outline-offset:4px}
 
-    .map-cta:hover,
-    .map-cta:focus-visible {
-      transform: translateY(-2px);
-      background: rgba(255, 250, 241, .98);
-      border-color: var(--gold-dark);
-      box-shadow:
-        0 10px 26px rgba(78, 43, 11, .26),
-        inset 0 1px 0 rgba(255,255,255,.95);
-    }
+/* small first-load shimmer to make the printed button feel interactive */
+.open-hotspot::before{
+  content:"";
+  position:absolute;
+  top:-35%;
+  left:-30%;
+  width:18%;
+  height:170%;
+  transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(255,245,212,.18),transparent);
+  animation:buttonShine 3.1s ease-in-out infinite;
+}
+@keyframes buttonShine{
+  0%,60%{left:-30%}
+  100%{left:120%}
+}
 
-    .map-cta:active {
-      transform: translateY(0) scale(.98);
-    }
+@media (max-width:640px){
+  .map-cta{right:3.5%;bottom:3.3%;padding:5px 9px 5px 5px;min-height:37px}
+  .map-pin{width:26px;height:26px;flex-basis:26px}
+  .map-pin svg{width:13px;height:13px}
+  .map-title{font-size:9.5px}
+  .map-sub{font-size:6.3px}
+  .music-button{width:41px;height:41px;top:10px;right:10px}
+  .music-button svg{width:20px;height:20px}
+}
 
-    .map-cta:focus-visible {
-      outline: 2px solid rgba(127, 39, 39, .72);
-      outline-offset: 3px;
-    }
-
-    .map-icon {
-      width: 30px;
-      height: 30px;
-      flex: 0 0 30px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      color: #fff9ed;
-      background: linear-gradient(180deg, #973737 0%, #731f1f 100%);
-      box-shadow: 0 4px 10px rgba(95, 24, 24, .22);
-    }
-
-    .map-icon svg {
-      width: 16px;
-      height: 16px;
-      display: block;
-    }
-
-    .map-copy {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-width: 0;
-      line-height: 1.05;
-      white-space: nowrap;
-    }
-
-    .map-title {
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .025em;
-    }
-
-    .map-subtitle {
-      margin-top: 3px;
-      font-family: Arial, sans-serif;
-      font-size: 8px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      color: #9b7042;
-    }
-
-    /* ---------------------------------------------------------
-       MUSIC BUTTON
-       Symbol only. The slash appears when music is muted/off.
-       --------------------------------------------------------- */
-    .music-button {
-      position: fixed;
-      right: max(16px, env(safe-area-inset-right));
-      bottom: max(16px, env(safe-area-inset-bottom));
-      z-index: 20;
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(143, 100, 31, .72);
-      border-radius: 50%;
-      color: var(--maroon);
-      background: rgba(255, 247, 232, .92);
-      box-shadow: 0 8px 24px rgba(65, 38, 9, .20);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      cursor: pointer;
-      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-
-    .music-button:hover,
-    .music-button:focus-visible {
-      transform: translateY(-2px);
-      background: #fffaf1;
-      box-shadow: 0 11px 28px rgba(65, 38, 9, .26);
-    }
-
-    .music-button:active {
-      transform: scale(.96);
-    }
-
-    .music-button:focus-visible {
-      outline: 2px solid rgba(127, 39, 39, .72);
-      outline-offset: 3px;
-    }
-
-    .music-button svg {
-      width: 23px;
-      height: 23px;
-      display: block;
-    }
-
-    .music-button .music-slash {
-      opacity: 0;
-      transition: opacity .18s ease;
-    }
-
-    .music-button[aria-pressed="false"] .music-slash {
-      opacity: 1;
-    }
-
-    /* Gentle attention only until audio has successfully started. */
-    .music-button.needs-gesture {
-      animation: musicHint 2.2s ease-in-out infinite;
-    }
-
-    @keyframes musicHint {
-      0%, 100% { box-shadow: 0 8px 24px rgba(65, 38, 9, .20), 0 0 0 0 rgba(185,137,63,0); }
-      50% { box-shadow: 0 8px 24px rgba(65, 38, 9, .20), 0 0 0 8px rgba(185,137,63,.15); }
-    }
-
-    @media (max-width: 640px) {
-      body {
-        padding: 8px;
-      }
-
-      .invitation {
-        width: 100%;
-        border-radius: 8px;
-      }
-
-      .map-cta {
-        right: 4.2%;
-        bottom: 4.7%;
-        min-height: 38px;
-        gap: 7px;
-        padding: 5px 10px 5px 6px;
-      }
-
-      .map-icon {
-        width: 27px;
-        height: 27px;
-        flex-basis: 27px;
-      }
-
-      .map-icon svg {
-        width: 14px;
-        height: 14px;
-      }
-
-      .map-title {
-        font-size: 10px;
-      }
-
-      .map-subtitle {
-        font-size: 7px;
-        margin-top: 2px;
-      }
-
-      .music-button {
-        width: 44px;
-        height: 44px;
-        right: max(11px, env(safe-area-inset-right));
-        bottom: max(11px, env(safe-area-inset-bottom));
-      }
-
-      .music-button svg {
-        width: 21px;
-        height: 21px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
-      }
-    }
-  </style>
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
 </head>
-
 <body>
-  <main class="invitation-stage">
-    <section class="invitation" aria-label="Gruhapravesham invitation">
-      <!-- Keep invitation.png in the same folder as this HTML file. -->
-      <img
-        class="invitation-image"
-        src="invitation.jpeg"
-        alt="Gruhapravesham house warming invitation"
-        draggable="false"
-      >
+<div class="app" id="app">
 
-      <!-- Interactive Google Maps location -->
+  <!-- ORIGINAL INVITATION -->
+  <section class="invitation-screen" aria-label="Sadanala Family Gruhapravesham invitation">
+    <img class="screen-backdrop" src="invitation.jpeg" alt="" aria-hidden="true">
+
+    <div class="invitation-poster">
+      <img class="invitation-image" src="invitation.jpeg" alt="Sadanala Family Gruhapravesham Invitation" draggable="false">
+
       <a
         class="map-cta"
         href="https://www.google.com/maps/search/Jayapradam%20Apartment/@17.48279199,78.37930255,17z?hl=en"
@@ -313,167 +274,107 @@
         rel="noopener noreferrer"
         aria-label="View venue location on Google Maps"
       >
-        <span class="map-icon" aria-hidden="true">
+        <span class="map-pin" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 22s7-6.08 7-12a7 7 0 1 0-14 0c0 5.92 7 12 7 12Z"
-              fill="currentColor"
-            />
-            <circle cx="12" cy="10" r="2.65" fill="#7b2424" />
+            <path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z" fill="currentColor"/>
+            <circle cx="12" cy="10" r="2.7" fill="#7b2424"/>
           </svg>
         </span>
-
         <span class="map-copy">
           <span class="map-title">View Location</span>
-          <span class="map-subtitle">Google Maps ↗</span>
+          <span class="map-sub">Google Maps ↗</span>
         </span>
       </a>
-    </section>
-  </main>
 
-  <!-- Keep music.mp3 in the same folder as this HTML file. -->
+      <button
+        class="music-button"
+        id="musicButton"
+        type="button"
+        aria-label="Pause background music"
+        aria-pressed="true"
+        title="Background music"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18V6.8L19 5v10.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="6.3" cy="18.2" rx="3.3" ry="2.5" fill="currentColor"/>
+          <ellipse cx="16.3" cy="15.4" rx="3.3" ry="2.5" fill="currentColor"/>
+          <path d="M9 9.4 19 7.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+          <path class="music-slash" d="M4 4 20 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- OPENING IMAGE -->
+  <section class="opening-screen" id="openingScreen" aria-label="Housewarming welcome screen">
+    <img class="screen-backdrop" src="opening.png" alt="" aria-hidden="true">
+
+    <div class="opening-poster">
+      <img class="opening-image" src="opening.png" alt="Housewarming celebration - tap Open Invitation to continue" draggable="false">
+      <button class="open-hotspot" id="openButton" type="button" aria-label="Open invitation">
+        Open Invitation
+      </button>
+    </div>
+  </section>
+
   <audio id="bgMusic" preload="auto" loop playsinline>
     <source src="music.mp3" type="audio/mpeg">
   </audio>
+</div>
 
-  <!-- Music icon only -->
-  <button
-    class="music-button needs-gesture"
-    id="musicButton"
-    type="button"
-    aria-label="Play background music"
-    aria-pressed="false"
-    title="Background music"
-  >
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M9 18V6.8L19 5v10.1"
-        stroke="currentColor"
-        stroke-width="1.9"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <ellipse cx="6.3" cy="18.2" rx="3.3" ry="2.5" fill="currentColor" />
-      <ellipse cx="16.3" cy="15.4" rx="3.3" ry="2.5" fill="currentColor" />
-      <path
-        d="M9 9.4 19 7.6"
-        stroke="currentColor"
-        stroke-width="1.9"
-        stroke-linecap="round"
-      />
+<script>
+(() => {
+  const app = document.getElementById('app');
+  const openingScreen = document.getElementById('openingScreen');
+  const openButton = document.getElementById('openButton');
+  const audio = document.getElementById('bgMusic');
+  const musicButton = document.getElementById('musicButton');
 
-      <!-- Visible only while music is off -->
-      <path
-        class="music-slash"
-        d="M4 4 20 20"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-      />
-    </svg>
-  </button>
+  let opened = false;
+  audio.volume = 0.55;
 
-  <script>
-    (() => {
-      const audio = document.getElementById('bgMusic');
-      const musicButton = document.getElementById('musicButton');
+  function syncMusicUI(){
+    const playing = !audio.paused && !audio.ended;
+    musicButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    musicButton.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+  }
 
-      let musicStarted = false;
-      let userMuted = false;
-      let starting = false;
+  async function openInvitation(){
+    if(opened) return;
+    opened = true;
 
-      // Set a comfortable initial background level.
-      audio.volume = 0.55;
+    /* The click on Open Invitation is the browser-approved user gesture for audio. */
+    try{
+      await audio.play();
+    }catch(err){
+      /* If a browser still blocks it, the music icon remains available after opening. */
+    }
+    syncMusicUI();
 
-      function updateMusicUI() {
-        const isPlaying = !audio.paused && !audio.ended;
+    app.classList.add('opened');
+    requestAnimationFrame(() => openingScreen.classList.add('hide'));
+  }
 
-        musicButton.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
-        musicButton.setAttribute(
-          'aria-label',
-          isPlaying ? 'Pause background music' : 'Play background music'
-        );
+  async function toggleMusic(event){
+    event.preventDefault();
+    event.stopPropagation();
 
-        if (musicStarted) {
-          musicButton.classList.remove('needs-gesture');
-        }
-      }
+    if(!audio.paused){
+      audio.pause();
+      syncMusicUI();
+      return;
+    }
 
-      async function startMusicFromGesture() {
-        if (userMuted || starting || (!audio.paused && !audio.ended)) return;
+    try{ await audio.play(); }catch(err){}
+    syncMusicUI();
+  }
 
-        starting = true;
-
-        try {
-          await audio.play();
-          musicStarted = true;
-          userMuted = false;
-        } catch (error) {
-          // Browsers may still block audio in some environments.
-          // Keep the music icon available for a direct tap.
-        } finally {
-          starting = false;
-          updateMusicUI();
-        }
-      }
-
-      async function toggleMusic(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!audio.paused) {
-          audio.pause();
-          userMuted = true;
-          updateMusicUI();
-          return;
-        }
-
-        userMuted = false;
-        await startMusicFromGesture();
-      }
-
-      musicButton.addEventListener('click', toggleMusic);
-
-      audio.addEventListener('play', () => {
-        musicStarted = true;
-        userMuted = false;
-        updateMusicUI();
-      });
-
-      audio.addEventListener('pause', updateMusicUI);
-
-      /*
-        Modern browsers generally require one real user gesture before
-        audible media can play. Listening at pointer/touch start means
-        a tap OR the beginning of a swipe can start the invitation music.
-      */
-      const firstGesture = (event) => {
-        // If the first action is on the music button, let its own handler
-        // control playback so it does not start and immediately pause.
-        if (event.target.closest && event.target.closest('#musicButton')) {
-          return;
-        }
-
-        startMusicFromGesture();
-      };
-
-      document.addEventListener('pointerdown', firstGesture, {
-        passive: true,
-        capture: true
-      });
-
-      // Fallback for older touch browsers that do not fully support Pointer Events.
-      document.addEventListener('touchstart', firstGesture, {
-        passive: true,
-        capture: true
-      });
-
-      document.addEventListener('keydown', firstGesture, {
-        capture: true
-      });
-
-      updateMusicUI();
-    })();
-  </script>
+  openButton.addEventListener('click', openInvitation);
+  musicButton.addEventListener('click', toggleMusic);
+  audio.addEventListener('play', syncMusicUI);
+  audio.addEventListener('pause', syncMusicUI);
+  syncMusicUI();
+})();
+</script>
 </body>
 </html>

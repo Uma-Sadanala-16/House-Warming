@@ -698,6 +698,27 @@
   var fluteTimer = null;
   var droneNodes = [];
 
+  /* GitHub Pages serves music.mp3 with "Content-Type: audio/mp3" — a
+     non-standard MIME type (the real one is "audio/mpeg", which is what the
+     <source type> below already declares). Desktop browsers shrug that
+     mismatch off and sniff the bytes anyway, but strict mobile engines
+     (iOS Safari especially, and many Android WebViews) refuse to play it at
+     all — a real, consistent rejection, not a gesture-timing race. GitHub
+     Pages gives no way to override the response header, so fetch the file
+     ourselves and re-tag it as "audio/mpeg" client-side via a Blob, then
+     point the <audio> element at that instead of the raw server URL. */
+  var mimeFixed = false;
+  (function fixAudioMimeType() {
+    fetch(fileAudio.querySelector("source").src)
+      .then(function (r) { return r.blob(); })
+      .then(function (blob) {
+        var retyped = blob.type === "audio/mpeg" ? blob : blob.slice(0, blob.size, "audio/mpeg");
+        fileAudio.src = URL.createObjectURL(retyped);
+      })
+      .catch(function () { /* leave the original <source src="music.mp3"> as the fallback */ })
+      .then(function () { mimeFixed = true; });
+  })();
+
   function ensureCtx() {
     if (ctx) return;
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -880,6 +901,11 @@
            for the same tap) — it says nothing about music.mp3 itself, so
            don't give up on the file over it. */
         if (err && err.name === "AbortError") return;
+        /* If the MIME re-tag above hasn't swapped in the corrected blob URL
+           yet, a rejection here likely just means the browser choked on the
+           raw server URL's bad Content-Type — not a real "this file can't
+           play" verdict. Wait for the retag instead of giving up on it. */
+        if (!mimeFixed) return;
         /* Passive gestures (page load, scroll, swipe-in-progress) aren't
            always accepted by the browser as real "user activation" for
            audio, so a rejection there just means try again on the next real

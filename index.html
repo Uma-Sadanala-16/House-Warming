@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7e8d4">
-<title>Sadanala Family Gruhapravesham Invitation</title>
+<title>Gruhapravesham Invitation</title>
 
 <!-- Purple rounded-square favicon with white U -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23b423e8'/%3E%3Cstop offset='1' stop-color='%237c20d6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-size='38' font-weight='700' fill='white'%3EU%3C/text%3E%3C/svg%3E">
@@ -63,6 +63,11 @@ a{
 
 /* =========================================================
    ORIGINAL INVITATION
+
+   IMPORTANT:
+   The invitation itself uses CONTAIN so the complete decorative
+   border remains visible. A blurred copy fills the unused viewport
+   area, so there are no plain top/bottom bars.
    ========================================================= */
 .invitation-screen{
   position:absolute;
@@ -70,7 +75,11 @@ a{
   z-index:1;
   width:100%;
   height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   overflow:hidden;
+  background:#e7bf78;
   opacity:0;
   transform:scale(1.02);
   transition:
@@ -83,11 +92,39 @@ a{
   transform:scale(1);
 }
 
-.invitation-poster{
+.invitation-backdrop{
+  position:absolute;
+  inset:-32px;
+  width:calc(100% + 64px);
+  height:calc(100% + 64px);
+  object-fit:cover;
+  object-position:48% center;
+  filter:blur(24px) saturate(.92) brightness(.93);
+  transform:scale(1.08);
+  opacity:.82;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
+
+.invitation-screen::after{
+  content:"";
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%;
+  z-index:1;
+  pointer-events:none;
+  background:rgba(246,225,187,.12);
+}
+
+.invitation-poster{
+  position:relative;
+  z-index:2;
+
+  /* Entire 2:3 invitation is always visible. */
+  width:min(100vw, calc(100dvh * 2 / 3));
+  aspect-ratio:2 / 3;
+  max-height:100dvh;
+
   margin:0;
   padding:0;
   overflow:hidden;
@@ -99,8 +136,8 @@ a{
   width:100%;
   height:100%;
   display:block;
-  object-fit:cover;
-  object-position:48% center;
+  object-fit:contain;
+  object-position:center center;
   user-select:none;
   -webkit-user-drag:none;
   pointer-events:none;
@@ -111,68 +148,106 @@ a{
    ========================================================= */
 .map-cta{
   position:absolute;
-  right:max(10px,3.5vw);
-  bottom:max(10px,3.2vh);
+  right:3.2%;
+  bottom:3.0%;
   z-index:8;
 
   display:inline-flex;
   align-items:center;
-  gap:7px;
+  gap:10px;
 
-  min-height:40px;
-  padding:6px 10px 6px 6px;
+  min-height:50px;
+  padding:7px 16px 7px 7px;
 
-  border:1px solid rgba(148,103,42,.78);
+  border:2px solid #e0b45e;
   border-radius:999px;
 
-  color:var(--maroon-dark);
-  background:rgba(255,248,236,.95);
+  color:#fffaf0;
+  background:linear-gradient(135deg,#6f1b1b 0%,#9b3434 100%);
   text-decoration:none;
 
-  box-shadow:0 8px 22px rgba(70,39,12,.22);
-  backdrop-filter:blur(7px);
-  -webkit-backdrop-filter:blur(7px);
+  box-shadow:
+    0 10px 28px rgba(81,23,23,.34),
+    0 0 0 0 rgba(224,180,94,0);
 
   opacity:0;
-  transform:translateY(10px);
+  transform:translateY(12px) scale(.96);
 
   transition:
     opacity .65s ease 1s,
     transform .65s ease 1s,
-    background .2s ease;
+    filter .2s ease,
+    box-shadow .2s ease;
+}
+
+.map-cta::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border:2px solid rgba(231,192,111,.7);
+  border-radius:999px;
+  opacity:0;
+  pointer-events:none;
 }
 
 .app.opened .map-cta{
   opacity:1;
-  transform:translateY(0);
+  transform:translateY(0) scale(1);
+  animation:locationGlow 2.2s ease-in-out 1.35s infinite;
+}
+
+.app.opened .map-cta::after{
+  animation:locationRing 2.2s ease-out 1.35s infinite;
+}
+
+@keyframes locationGlow{
+  0%,100%{
+    box-shadow:
+      0 10px 28px rgba(81,23,23,.34),
+      0 0 0 0 rgba(224,180,94,0);
+  }
+  50%{
+    box-shadow:
+      0 12px 31px rgba(81,23,23,.42),
+      0 0 0 9px rgba(224,180,94,.20);
+  }
+}
+
+@keyframes locationRing{
+  0%{opacity:.8;transform:scale(.98)}
+  70%,100%{opacity:0;transform:scale(1.14)}
 }
 
 .map-cta:hover,
 .map-cta:focus-visible{
-  background:#fffaf1;
+  filter:brightness(1.08);
+  transform:translateY(-2px) scale(1.02);
+}
+
+.map-cta:active{
+  transform:scale(.98);
 }
 
 .map-cta:focus-visible{
-  outline:2px solid var(--gold);
+  outline:3px solid #fff4d2;
   outline-offset:3px;
 }
 
 .map-pin{
-  width:28px;
-  height:28px;
-  flex:0 0 28px;
-
+  width:36px;
+  height:36px;
+  flex:0 0 36px;
   display:grid;
   place-items:center;
-
   border-radius:50%;
-  background:linear-gradient(180deg,#983636,#711d1d);
-  color:#fff8eb;
+  background:#fff5df;
+  color:#812727;
+  box-shadow:inset 0 0 0 1px rgba(185,138,62,.45);
 }
 
 .map-pin svg{
-  width:14px;
-  height:14px;
+  width:19px;
+  height:19px;
 }
 
 .map-copy{
@@ -184,17 +259,18 @@ a{
 
 .map-title{
   font-family:Georgia,"Times New Roman",serif;
-  font-size:10px;
+  font-size:13px;
   font-weight:700;
+  letter-spacing:.025em;
 }
 
 .map-sub{
-  margin-top:3px;
-  font-size:6.8px;
+  margin-top:5px;
+  font-size:8px;
   font-weight:700;
-  letter-spacing:.06em;
+  letter-spacing:.10em;
   text-transform:uppercase;
-  color:#a37b4d;
+  color:#f0d49c;
 }
 
 /* =========================================================
@@ -392,29 +468,31 @@ a{
 
 @media (max-width:640px){
   .map-cta{
-    right:max(9px,3vw);
-    bottom:max(9px,2.7vh);
-    padding:5px 9px 5px 5px;
-    min-height:37px;
+    right:3.2%;
+    bottom:2.8%;
+    min-height:46px;
+    padding:6px 13px 6px 6px;
+    gap:8px;
   }
 
   .map-pin{
-    width:26px;
-    height:26px;
-    flex-basis:26px;
+    width:32px;
+    height:32px;
+    flex-basis:32px;
   }
 
   .map-pin svg{
-    width:13px;
-    height:13px;
+    width:17px;
+    height:17px;
   }
 
   .map-title{
-    font-size:9.5px;
+    font-size:11px;
   }
 
   .map-sub{
-    font-size:6.3px;
+    font-size:7px;
+    margin-top:4px;
   }
 
   .music-button{
@@ -443,6 +521,14 @@ a{
 
   <!-- ORIGINAL INVITATION -->
   <section class="invitation-screen" aria-label="Sadanala Family Gruhapravesham invitation">
+    <img
+      class="invitation-backdrop"
+      src="invitation.jpeg"
+      alt=""
+      aria-hidden="true"
+      draggable="false"
+    >
+
     <div class="invitation-poster">
 
       <!-- Your existing invitation image -->
@@ -467,7 +553,7 @@ a{
               d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"
               fill="currentColor"
             />
-            <circle cx="12" cy="10" r="2.7" fill="#7b2424"/>
+            <circle cx="12" cy="10" r="2.7" fill="#fff5df"/>
           </svg>
         </span>
 

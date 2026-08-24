@@ -401,6 +401,14 @@
     color: var(--deep);
   }
   .music:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  /* subtle nudge toward the one gesture that reliably starts audio (a real
+     tap/click) — removed the moment music actually starts playing */
+  .music.pulse { animation: map-btn-glow 2.6s ease-in-out infinite; }
+  .music.pulse:hover,
+  .music.pulse:focus-visible { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .music.pulse { animation: none; }
+  }
   @media (prefers-reduced-motion: no-preference) {
     .music[aria-pressed="true"] .m-flame { animation: flicker 2.2s ease-in-out infinite; }
   }
@@ -510,7 +518,7 @@
     </div>
   </main>
 
-  <button class="music" id="musicBtn" aria-pressed="false" aria-label="Play background music">
+  <button class="music pulse" id="musicBtn" aria-pressed="false" aria-label="Play background music">
     <svg width="18" height="20" viewBox="0 0 24 26" fill="none" aria-hidden="true">
       <path class="m-flame" d="M12 2c1.8 2.4 3 4.2 3 6.2 0 2-1.4 3.4-3 3.4s-3-1.4-3-3.4C9 6.2 10.2 4.4 12 2Z" fill="currentColor" opacity="0.85"/>
       <path d="M3 16c2.6 1.6 5.6 2.4 9 2.4s6.4-.8 9-2.4c-.6 4-4.4 7-9 7s-8.4-3-9-7Z" fill="currentColor"/>
@@ -894,6 +902,7 @@
 
   function markPlaying() {
     playing = true;
+    btn.classList.remove("pulse");
     btn.setAttribute("aria-pressed", "true");
     btn.setAttribute("aria-label", "Pause background music");
     label.textContent = "Playing";

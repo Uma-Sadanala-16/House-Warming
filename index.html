@@ -693,6 +693,7 @@
   var fileAudio = document.getElementById("musicFile");
   var playing = false;
   var mode = null;             /* "file" | "synth" */
+  var pending = null;          /* in-flight fileAudio.play() promise — guards against overlapping play()/pause() calls */
   var ctx = null, master = null, schedTimer = null, nextNoteAt = 0, step = 0;
   var fluteTimer = null;
   var droneNodes = [];
@@ -846,7 +847,11 @@
   }
 
   function stopAll() {
-    if (mode === "file") fileAudio.pause();
+    var doPause = function () { if (mode === "file") fileAudio.pause(); };
+    /* if a play() is still in flight, wait for it before pausing — calling
+       pause() while play() is pending is exactly what triggers the mobile
+       AbortError that used to knock playback into the synth fallback */
+    if (pending) { pending.then(doPause); } else { doPause(); }
     stopSynth();
     playing = false;
     btn.setAttribute("aria-pressed", "false");
@@ -863,14 +868,23 @@
 
   function startMusic() {
     if (playing) return Promise.resolve();
+    if (pending) return pending;
     if (mode === "synth") { startSynth(); markPlaying(); return Promise.resolve(); }
-    if (mode === "file") {
-      return fileAudio.play().then(markPlaying).catch(function () { mode = "synth"; startSynth(); markPlaying(); });
-    }
     fileAudio.volume = 0.55;
-    return fileAudio.play()
+    pending = fileAudio.play()
       .then(function () { mode = "file"; markPlaying(); })
-      .catch(function () { mode = "synth"; startSynth(); markPlaying(); });
+      .catch(function (err) {
+        /* AbortError just means this play() got interrupted by another
+           play()/pause() call landing at the same instant (e.g. the button's
+           own click handler and the page-wide "first tap" handler both firing
+           for the same tap) — it says nothing about music.mp3 itself, so
+           don't give up on the file over it. Only fall back to the veena
+           synth when the file truly can't play. */
+        if (err && err.name === "AbortError") return;
+        mode = "synth"; startSynth(); markPlaying();
+      })
+      .then(function () { pending = null; });
+    return pending;
   }
 
   btn.addEventListener("click", function () {
@@ -887,9 +901,10 @@
      that mismatch was why music worked on laptop but stayed silent on phone. */
   window.addEventListener("load", function () {
     fileAudio.volume = 0.55;
-    fileAudio.play()
+    pending = fileAudio.play()
       .then(function () { mode = "file"; markPlaying(); })
-      .catch(function () { /* autoplay blocked — wait for first interaction */ });
+      .catch(function () { /* autoplay blocked — wait for first interaction */ })
+      .then(function () { pending = null; });
   });
   ["click", "touchend", "keydown"].forEach(function (evt) {
     document.addEventListener(evt, function () { startMusic(); }, { once: true });
